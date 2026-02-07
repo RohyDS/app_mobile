@@ -6,6 +6,10 @@ import Connexion from '@/views/Connexion.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
+    path: '/',
+    redirect: '/login'
+  },
+  {
     path: '/login',
     component: Connexion,
   },
@@ -18,16 +22,20 @@ const routes: Array<RouteRecordRaw> = [
     component: TabsPage,
     children: [
       {
-        path: 'tab1',
-        redirect: '/tabs/tab1'
+        path: '',
+        redirect: '/accueil/reparations'
       },
       {
-        path: 'signup',
-        component: () => import('@/views/Signup.vue')
+        path: 'reparations',
+        component: () => import('@/views/MesReparations.vue')
       },
       {
-        path: 'tab3',
-        component: () => import('@/views/Tab3Page.vue')
+        path: 'panne',
+        component: () => import('@/views/SignalerPanne.vue')
+      },
+      {
+        path: 'profil',
+        component: () => import('@/views/Profil.vue')
       }
     ]
   }

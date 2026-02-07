@@ -1,45 +1,64 @@
-<style scoped>
-.signup-content {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
+<template>
+  <ion-page>
+    <ion-content class="ion-padding auth-container">
+      <div class="auth-header">
+        <h1>Créer un compte</h1>
+        <p>Rejoignez-nous dès aujourd'hui</p>
+      </div>
 
-.input-item {
-  width: 100%;
-  max-width: 360px;
-  margin-bottom: 16px;
-  border-radius: 8px;
-}
+      <div class="auth-form">
+        <ion-item lines="none" class="custom-item">
+          <ion-label position="stacked">Nom complet</ion-label>
+          <ion-input
+            placeholder="Jean Dupont"
+            @ionInput="nom = $event.target.value"
+          ></ion-input>
+        </ion-item>
 
-.signup-btn {
-  width: 100%;
-  max-width: 360px;
-  margin-top: 20px;
-  border-radius: 8px;
-}
+        <ion-item lines="none" class="custom-item">
+          <ion-label position="stacked">Adresse</ion-label>
+          <ion-input
+            placeholder="123 Rue de Rivoli"
+            @ionInput="adresse = $event.target.value"
+          ></ion-input>
+        </ion-item>
 
-.login-link {
-  margin-top: 16px;
-  font-size: 14px;
-}
+        <ion-item lines="none" class="custom-item">
+          <ion-label position="stacked">Email</ion-label>
+          <ion-input
+            type="email"
+            placeholder="votre@email.com"
+            @ionInput="email = $event.target.value"
+          ></ion-input>
+        </ion-item>
 
-.login-link span {
-  color: var(--ion-color-primary);
-  font-weight: bold;
-  cursor: pointer;
-}
-</style>
+        <ion-item lines="none" class="custom-item">
+          <ion-label position="stacked">Mot de passe</ion-label>
+          <ion-input
+            type="password"
+            placeholder="••••••••"
+            @ionInput="password = $event.target.value"
+          ></ion-input>
+        </ion-item>
+
+        <ion-button expand="block" class="auth-button" @click="inscription">
+          S'inscrire
+        </ion-button>
+
+        <div class="auth-footer">
+          <p>Déjà un compte ? <span @click="router.push('/login')">Se connecter</span></p>
+        </div>
+      </div>
+    </ion-content>
+  </ion-page>
+</template>
+
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 
 import {
   IonPage,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
   IonContent,
   IonItem,
   IonLabel,
@@ -58,8 +77,6 @@ const adresse = ref("");
 const router = useRouter();
 
 const inscription = async () => {
-  console.log(nom.value, email.value, password.value);
-
   if (!email.value || !password.value) {
     alert("Champs manquants");
     return;
@@ -71,64 +88,102 @@ const inscription = async () => {
       email.value,
       password.value
     );
-    router.push("/accueil/tab2");
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+    router.push("/accueil/reparations");
   } catch (e) {
     alert(e.message);
   }
 };
 </script>
 
-<template>
-  <ion-page>
-    <ion-header>
-      <ion-toolbar>
-        <ion-title>Inscription</ion-title>
-      </ion-toolbar>
-    </ion-header>
+<style scoped>
+.auth-container {
+  --background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
 
-    <ion-content class="ion-padding signup-content">
+.auth-header {
+  text-align: center;
+  margin-bottom: 30px;
+  margin-top: 40px;
+}
 
-      <ion-item class="input-item">
-        <ion-label position="floating">Nom</ion-label>
-        <ion-input @ionInput="nom = $event.target.value"></ion-input>
-      </ion-item>
-    <ion-item class="input-item">
-        <ion-label position="floating">adresse</ion-label>
-        <ion-input @ionInput="adresse = $event.target.value"></ion-input>
-      </ion-item>
+.auth-header h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--ion-color-dark);
+  margin-bottom: 8px;
+  letter-spacing: -1px;
+}
 
-      <ion-item class="input-item">
-        <ion-label position="floating">Email</ion-label>
-        <ion-input
-          type="email"
-          @ionInput="email = $event.target.value"
-        ></ion-input>
-      </ion-item>
+.auth-header p {
+  color: var(--ion-color-medium);
+  font-size: 1.1rem;
+}
 
-      <ion-item class="input-item">
-        <ion-label position="floating">Mot de passe</ion-label>
-        <ion-input
-          type="password"
-          @ionInput="password = $event.target.value"
-        ></ion-input>
-      </ion-item>
+.auth-form {
+  max-width: 400px;
+  margin: 0 auto;
+  width: 100%;
+}
 
+.custom-item {
+  --background: #ffffff;
+  --border-radius: 16px;
+  --padding-start: 20px;
+  --inner-padding-end: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid #edf2f7;
+}
 
-      <ion-button expand="block" class="signup-btn" @click="inscription">
-        S’inscrire
-      </ion-button>
+.custom-item ion-label {
+  font-weight: 600;
+  color: var(--ion-color-primary);
+  margin-bottom: 6px !important;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  letter-spacing: 0.5px;
+}
 
-      <!-- Lien connexion -->
-      <p class="login-link">
-        Déjà un compte ?
-        <span @click="router.push('/login')">Se connecter</span>
-      </p>
+.auth-button {
+  margin-top: 24px;
+  --background: var(--ion-color-primary);
+  --background-activated: var(--ion-color-primary-shade);
+  --border-radius: 16px;
+  height: 56px;
+  font-size: 1.1rem;
+  letter-spacing: 0.5px;
+}
 
-      <!-- DEBUG -->
-      <p>Nom : {{ nom }}</p>
-      <p>Email : {{ email }}</p>
-      <p>MDP : {{ password }}</p>
+.auth-footer {
+  text-align: center;
+  margin-top: 24px;
+  margin-bottom: 40px;
+}
 
-    </ion-content>
-  </ion-page>
-</template>
+.auth-footer p {
+  color: var(--ion-color-medium);
+}
+
+.auth-footer span {
+  color: var(--ion-color-primary);
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+@media (prefers-color-scheme: dark) {
+  .auth-container {
+    --background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+  }
+  .custom-item {
+    --background: #2d3748;
+    border-color: #4a5568;
+  }
+}
+</style>

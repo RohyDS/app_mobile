@@ -1,11 +1,22 @@
 <template>
   <div id="container">
-    <strong>{{ name }}</strong>
-    <p>Explore <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
+    <div class="content-wrapper">
+      <div class="icon-circle">
+        <ion-icon :icon="sparklesOutline"></ion-icon>
+      </div>
+      <strong>{{ name }}</strong>
+      <p>Bienvenue dans votre nouvelle interface élégante. Commencez à explorer vos fonctionnalités.</p>
+      <ion-button fill="clear" class="action-link">
+        En savoir plus
+        <ion-icon slot="end" :icon="arrowForwardOutline"></ion-icon>
+      </ion-button>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { IonIcon, IonButton } from '@ionic/vue';
+import { sparklesOutline, arrowForwardOutline } from 'ionicons/icons';
 defineProps({
   name: String,
 });
@@ -13,27 +24,60 @@ defineProps({
 
 <style scoped>
 #container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 20px;
+  background-color: var(--ion-color-light);
+}
+
+.content-wrapper {
   text-align: center;
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
+  max-width: 300px;
 }
 
-#container strong {
-  font-size: 20px;
-  line-height: 26px;
+.icon-circle {
+  width: 80px;
+  height: 80px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  color: var(--ion-color-primary);
+  font-size: 32px;
 }
 
-#container p {
+strong {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--ion-color-dark);
+  display: block;
+  margin-bottom: 12px;
+  letter-spacing: -0.5px;
+}
+
+p {
   font-size: 16px;
-  line-height: 22px;
-  color: #8c8c8c;
-  margin: 0;
+  line-height: 1.6;
+  color: var(--ion-color-medium);
+  margin-bottom: 24px;
 }
 
-#container a {
-  text-decoration: none;
+.action-link {
+  --color: var(--ion-color-primary);
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  .icon-circle {
+    background: #2d3748;
+    color: var(--ion-color-primary);
+  }
 }
 </style>
