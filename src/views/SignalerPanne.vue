@@ -57,7 +57,7 @@ import {
   IonItem, IonLabel, IonInput, IonTextarea, IonSelect, 
   IonSelectOption, IonButton, IonSpinner, toastController 
 } from '@ionic/vue';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
 import { db, auth } from '@/firebaseConfig';
 
 const router = useRouter();
@@ -93,9 +93,30 @@ const envoyerPanne = async () => {
   }
 
   submitting.value = true;
-  console.log("Début de l'envoi de la panne...", form);
-  
+  console.log("Vérification de la capacité du garage...");
+
   try {
+    // Vérifier le nombre de voitures actuellement en réparation (Uniquement "En cours")
+    // Le garage accepte 2 voitures EN MÊME TEMPS en réparation.
+    const qCount = query(
+      collection(db, "repairs"), 
+      where("statut", "==", "En cours")
+    );
+    const querySnapshot = await getDocs(qCount);
+    const inProgressCount = querySnapshot.size;
+
+    if (inProgressCount >= 2) {
+      const toast = await toastController.create({
+        message: 'Désolé, le garage est complet (2 voitures sont déjà en cours de réparation). Veuillez patienter.',
+        duration: 4000,
+        color: 'danger',
+        position: 'top'
+      });
+      await toast.present();
+      submitting.value = false;
+      return;
+    }
+
     const user = auth.currentUser;
     if (!user) {
       console.error("Aucun utilisateur connecté lors de l'envoi");
@@ -113,6 +134,7 @@ const envoyerPanne = async () => {
     const docPromise = addDoc(collection(db, "repairs"), {
       userId: user.uid,
       userEmail: user.email,
+      userName: user.displayName || user.email.split('@')[0],
       modele: form.modele,
       immatriculation: form.immatriculation,
       type: form.type,

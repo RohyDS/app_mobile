@@ -31,15 +31,16 @@ const login = async () => {
   try {
     const userCredential = await signInWithEmailAndPassword(
       auth,
-      email.value,
+      email.value.trim(),
       password.value
     );
-    alert("vous etes connectee");
     console.log("Connecté :", userCredential.user.email);
     if (document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();
     }
-    router.push("/accueil/reparations");
+    // On remplace le push par un replace pour éviter les problèmes d'historique
+    // et on s'assure que le chemin est correct
+    router.replace("/accueil/reparations");
 
   } catch (error) {
     alert("Email ou mot de passe incorrect");

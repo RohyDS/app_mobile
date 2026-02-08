@@ -36,6 +36,14 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: 'profil',
         component: () => import('@/views/Profil.vue')
+      },
+      {
+        path: 'notifications',
+        component: () => import('@/views/Notifications.vue')
+      },
+      {
+        path: 'payments',
+        component: () => import('@/views/Payments.vue')
       }
     ]
   }

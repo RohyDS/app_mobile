@@ -66,7 +66,7 @@ import {
   IonButton
 } from "@ionic/vue";
 
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "@/firebaseConfig";
 
 const nom = ref("");
@@ -77,17 +77,23 @@ const adresse = ref("");
 const router = useRouter();
 
 const inscription = async () => {
-  if (!email.value || !password.value) {
-    alert("Champs manquants");
+  if (!email.value || !password.value || !nom.value) {
+    alert("Veuillez remplir tous les champs (Nom, Email, Mot de passe)");
     return;
   }
 
   try {
-    await createUserWithEmailAndPassword(
+    const userCredential = await createUserWithEmailAndPassword(
       auth,
       email.value,
       password.value
     );
+
+    // Mettre à jour le profil avec le nom
+    await updateProfile(userCredential.user, {
+      displayName: nom.value
+    });
+
     if (document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();
     }
