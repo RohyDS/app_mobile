@@ -48,24 +48,49 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { 
   IonPage, IonHeader, IonToolbar, IonTitle, IonContent, 
   IonList, IonItem, IonLabel, IonIcon, IonBadge, IonToggle,
-  alertController
+  alertController, onIonViewWillEnter
 } from '@ionic/vue';
 import { 
   personOutline, carOutline, cardOutline, 
   notificationsOutline, logOutOutline 
 } from 'ionicons/icons';
 import { auth, db } from '@/firebaseConfig';
-import { signOut } from 'firebase/auth';
+import { signOut, onAuthStateChanged } from 'firebase/auth';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 
 const router = useRouter();
 const userEmail = ref('');
 const repairCount = ref(0);
+const loading = ref(false);
+let authListener: any = null;
+
+const fetchProfileData = async (user: any) => {
+  console.log("Fetching profile data for user:", user?.email);
+  if (user) {
+    loading.value = true;
+    userEmail.value = user.email || 'Utilisateur';
+    try {
+      const q = query(collection(db, "repairs"), where("userId", "==", user.uid));
+      const querySnapshot = await getDocs(q);
+      repairCount.value = querySnapshot.size;
+      console.log("Repair count updated:", repairCount.value);
+    } catch (error) {
+      console.error("Error fetching repairs count:", error);
+      repairCount.value = 0;
+    } finally {
+      loading.value = false;
+    }
+  } else {
+    userEmail.value = '';
+    repairCount.value = 0;
+    loading.value = false;
+  }
+};
 
 const handleLogout = async () => {
   const alert = await alertController.create({
@@ -76,8 +101,14 @@ const handleLogout = async () => {
       { 
         text: 'Oui', 
         handler: async () => {
-          await signOut(auth);
-          router.push('/login');
+          try {
+            await signOut(auth);
+            userEmail.value = '';
+            repairCount.value = 0;
+            router.replace('/login');
+          } catch (error) {
+            console.error("Error signing out:", error);
+          }
         }
       }
     ]
@@ -85,16 +116,19 @@ const handleLogout = async () => {
   await alert.present();
 };
 
-onMounted(async () => {
-  const user = auth.currentUser;
-  if (user) {
-    userEmail.value = user.email || 'Utilisateur';
-    
-    // Compter les réparations
-    const q = query(collection(db, "repairs"), where("userId", "==", user.uid));
-    const querySnapshot = await getDocs(q);
-    repairCount.value = querySnapshot.size;
-  }
+onIonViewWillEnter(() => {
+  console.log("Profile view entering, checking user...");
+  fetchProfileData(auth.currentUser);
+});
+
+onMounted(() => {
+  authListener = onAuthStateChanged(auth, (user) => {
+    fetchProfileData(user);
+  });
+});
+
+onUnmounted(() => {
+  if (authListener) authListener();
 });
 </script>
 

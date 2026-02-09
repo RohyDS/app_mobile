@@ -61,14 +61,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, onUnmounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { 
   IonPage, IonHeader, IonToolbar, IonTitle, IonContent, 
   IonList, IonItem, IonBadge, IonProgressBar, IonButton, 
-  IonSpinner, IonIcon, onIonViewDidEnter, alertController,
+  IonSpinner, IonIcon, onIonViewDidEnter, onIonViewWillEnter, alertController,
   toastController
 } from '@ionic/vue';
+import { onAuthStateChanged } from 'firebase/auth';
 import { carOutline } from 'ionicons/icons';
 import { collection, query, where, onSnapshot, doc, getDoc } from 'firebase/firestore';
 import { db, auth } from '@/firebaseConfig';
@@ -180,35 +181,62 @@ const processPayment = async (car: any) => {
   }
 };
 
-onMounted(() => {
-  const unsubscribe = auth.onAuthStateChanged((user) => {
-    if (!user) {
-      router.push('/login');
-      return;
-    }
+let unsubscribeFirestore: (() => void) | null = null;
+let authListener: (() => void) | null = null;
 
-    const q = query(collection(db, "repairs"), where("userId", "==", user.uid));
-    
-    onSnapshot(q, (snapshot) => {
-      console.log("Firestore update received, docs count:", snapshot.docs.length);
-      const newCars: any[] = [];
-      snapshot.docs.forEach(doc => {
-        const data = doc.data();
-        const id = doc.id;
-        
-        newCars.push({
-          id,
-          ...data
-        });
-      });
+const setupRepairsListener = (user: any) => {
+  if (unsubscribeFirestore) {
+    unsubscribeFirestore();
+    unsubscribeFirestore = null;
+  }
+
+  if (!user) {
+    cars.value = [];
+    loading.value = false;
+    router.push('/login');
+    return;
+  }
+
+  loading.value = true;
+  const q = query(collection(db, "repairs"), where("userId", "==", user.uid));
+  
+  unsubscribeFirestore = onSnapshot(q, (snapshot) => {
+    console.log("Firestore update received, docs count:", snapshot.docs.length);
+    const newCars: any[] = [];
+    snapshot.docs.forEach(doc => {
+      const data = doc.data();
+      const id = doc.id;
       
-      cars.value = newCars;
-      loading.value = false;
-    }, (error) => {
-      console.error("Error fetching repairs:", error);
-      loading.value = false;
+      newCars.push({
+        id,
+        ...data
+      });
     });
+    
+    cars.value = newCars;
+    loading.value = false;
+  }, (error) => {
+    console.error("Error fetching repairs:", error);
+    loading.value = false;
   });
+};
+
+onMounted(() => {
+  authListener = onAuthStateChanged(auth, (user) => {
+    setupRepairsListener(user);
+  });
+});
+
+onUnmounted(() => {
+  if (authListener) authListener();
+  if (unsubscribeFirestore) unsubscribeFirestore();
+});
+
+onIonViewWillEnter(() => {
+  // S'assurer que les données sont rafraîchies si l'utilisateur change
+  if (auth.currentUser) {
+    setupRepairsListener(auth.currentUser);
+  }
 });
 </script>
 
