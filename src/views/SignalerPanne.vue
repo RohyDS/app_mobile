@@ -36,7 +36,7 @@
           <ion-textarea 
             v-model="form.panne" 
             placeholder="Détaillez le problème rencontré..."
-            rows="4"
+            :rows="4"
           ></ion-textarea>
         </ion-item>
 
@@ -133,8 +133,8 @@ const envoyerPanne = async () => {
 
     const docPromise = addDoc(collection(db, "repairs"), {
       userId: user.uid,
-      userEmail: user.email,
-      userName: user.displayName || user.email.split('@')[0],
+      userEmail: user.email || '',
+      userName: user.displayName || (user.email ? user.email.split('@')[0] : 'Utilisateur'),
       modele: form.modele,
       immatriculation: form.immatriculation,
       type: form.type,
