@@ -243,66 +243,98 @@ onIonViewWillEnter(() => {
 <style scoped>
 .car-card {
   --background: #ffffff;
-  --border-radius: 16px;
-  margin-bottom: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  border: 1px solid #edf2f7;
+  --border-radius: 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+  border: 1px solid #f1f5f9;
+  overflow: hidden;
 }
 
 .card-content {
-  padding: 16px;
+  padding: 20px;
   width: 100%;
 }
 
 .card-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 12px;
+  align-items: center;
+  margin-bottom: 16px;
 }
 
 .car-info h3 {
   margin: 0;
-  font-size: 1.2rem;
-  font-weight: 700;
+  font-size: 1.35rem;
+  font-weight: 800;
   color: var(--ion-color-dark);
+  letter-spacing: -0.025em;
 }
 
 .car-info p {
   margin: 4px 0 0;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
+  font-weight: 500;
   color: var(--ion-color-medium);
 }
 
 .price-tag {
   color: var(--ion-color-success) !important;
-  font-weight: 600;
-  font-size: 0.95rem !important;
-  margin-top: 8px !important;
+  font-weight: 700;
+  font-size: 1.05rem !important;
+  margin-top: 10px !important;
+  background: #ecfdf5;
+  padding: 6px 12px;
+  border-radius: 10px;
+  display: inline-block;
 }
 
 .slot-info {
   color: var(--ion-color-primary) !important;
-  font-weight: 500;
-  margin-top: 4px !important;
+  font-weight: 600;
+  margin-top: 6px !important;
+  font-size: 0.85rem !important;
+}
+
+.repair-details {
+  background: #f8fafc;
+  padding: 16px;
+  border-radius: 16px;
+  margin-top: 16px;
 }
 
 .repair-details p {
   font-size: 0.95rem;
   color: var(--ion-color-dark);
+  margin: 0;
+  line-height: 1.5;
 }
 
 .progress-container {
-  margin-top: 12px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
+  margin-top: 16px;
+}
+
+ion-progress-bar {
+  height: 10px;
+  --border-radius: 5px;
+  margin-bottom: 8px;
 }
 
 .progress-container span {
   font-size: 0.85rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--ion-color-primary);
+}
+
+ion-badge {
+  --padding-start: 12px;
+  --padding-end: 12px;
+  --padding-top: 6px;
+  --padding-bottom: 6px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
 }
 
 .card-footer {
@@ -337,8 +369,17 @@ onIonViewWillEnter(() => {
 
 @media (prefers-color-scheme: dark) {
   .car-card {
-    --background: #2d3748;
-    border-color: #4a5568;
+    --background: #1e293b;
+    border-color: #334155;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+  }
+  
+  .repair-details {
+    background: #0f172a;
+  }
+  
+  .price-tag {
+    background: rgba(16, 185, 129, 0.1);
   }
 }
 </style>
